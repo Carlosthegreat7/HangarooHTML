@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangaroo Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('ggg.gif'); /* Replace with your image URL */
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            
+        }
+
+        #hangaroo-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+            text-align: center;
+            background: url('woodd.jpg');
+            opacity: 90%;
+        }
+
+        #word-display {
+            margin-top: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #333;
+        }
+
+        #answer-display {
+            margin-top: 10px;
+            font-size: 24px;
+            color: #555;
+        }
+
+        #keyboard {
+            margin-top: 20px;
+        }
+
+        #clue-button {
+            margin-top: 20px;
+            margin: auto;
+            padding: 17px;
+            cursor: pointer;
+            background-color: #0f3219;
+            color: #fff;
+            font-size: 16px;
+            border: 5px #38a51d;
+            border-style: double;
+            border-radius: 30px;
+            opacity: 90%;
+            
+        }
+
+        #clue-button:hover {
+            background-color: #e2e2e2;
+        }
+
+        #difficulty-warning {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #e74c3c;
+        }
+
+        #score-display {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2ecc71;
+        }
+
+        #lives {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .heart {
+            color: red;
+            font-size: 24px;
+            padding: 0 5px;
+            user-select: none; /* Prevents text selection */
+        }
+
+        /* Style for a lost life (greyed out) */
+        .heart.lost {
+            color: #ccc;
+        }
+
+        .letter,
+        .number,
+        #space-button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #41644A;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+
+        }
+
+        .letter:hover,
+        .number:hover,
+        #space-button:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div id="hangaroo-container">
+        <div id="word-display"></div>
+        <div id="answer-display"></div>
+        <div id="keyboard"></div>
+        <div id="difficulty-warning" class="difficulty-warning"></div>
+        <div id="score-display"></div> <br>
+        <div id="lives">
+            Lives: <span class="heart" id="heart1">&#10084;</span>
+            <span class="heart" id="heart2">&#10084;</span>
+            <span class="heart" id="heart3">&#10084;</span>
+        </div>
+        <button id="clue-button" onclick="promptForClueType()">Give Clue</button>
+    </div>
+
+<script>
+    const easyQuestions = [
+    { question: "What is the closest planet to the Sun?", answer: "MERCURY", difficulty: "EASY" },
+        { question: "Which animal lays the largest eggs?", answer: "OSTRICH", difficulty: "EASY" },
+        { question: "What is the name of the tallest mountain on earth?", answer: "MOUNT EVEREST", difficulty: "EASY" },
+        { question: "In which country would you find the Sydney Opera House?", answer: "AUSTRALIA", difficulty: "EASY" },
+        { question: "What is the orange part of an egg called?", answer: "YOLK", difficulty: "EASY" },
+        { question: "What is a baby kangaroo called?", answer: "JOEY", difficulty: "EASY" },
+        { question: "In which country can you find the Eiffel Tower?", answer: "FRANCE", difficulty: "EASY" },
+        { question: "What is the name of a shape with 5 sides?", answer: "PENTAGON", difficulty: "EASY" },
+        { question: "Where do polar bears live?", answer: "THE ARCTIC", difficulty: "EASY" },
+        { question: "Which is faster, light or sound?", answer: "LIGHT", difficulty: "EASY" },
+    ];
+
+    const moderateQuestions = [
+        { question: "In programming, what does the acronym 'HTML' stand for?", answer: "HYPERTEXT MARKUP LANGUAGE", difficulty: "MODERATE" },
+        { question: "What does the acronym 'CSS' stand for in web development?", answer: "CASCADING STYLE SHEETS", difficulty: "MODERATE" },
+        { question: "What is the main purpose of a firewall in network security?", answer: "PROTECT AGAINST UNAUTHORIZED ACCESS", difficulty: "MODERATE" },
+        { question: "What is theault port for HTTP?", answer: "80", difficulty: "MODERATE" },
+        { question: "What programming def language is often used for artificial intelligence?", answer: "PYTHON", difficulty: "MODERATE" },
+        { question: "What is the purpose of a 'while' loop in programming?", answer: "REPEAT CODE WHILE A CONDITION IS TRUE", difficulty: "MODERATE" },
+        { question: "What is the difference between 'var', 'let', and 'const' in JavaScript?", answer: "VARIABLE DECLARATION KEYWORDS", difficulty: "MODERATE" },
+        { question: "What does 'API' stand for in the context of software development?", answer: "APPLICATION PROGRAMMING INTERFACE", difficulty: "MODERATE" },
+        { question: "What is the function of 'git' in version control?", answer: "TRACK CHANGES IN SOURCE CODE", difficulty: "MODERATE" },
+        { question: "What does 'URL' stand for in web addresses?", answer: "UNIFORM RESOURCE LOCATOR", difficulty: "MODERATE" },
+    ];
+
+    const hardQuestions = [
+        { question: "Describe the differences between abstraction and encapsulation in object-oriented programming.", answer: "CONCEPTS IN OOP", difficulty: "DIFFICULT" },
+        { question: "Explain the concept of multithreading in computer programming.", answer: "EXECUTING MULTIPLE THREADS SIMULTANEOUSLY", difficulty: "DIFFICULT" },
+        { question: "What is the purpose of a VPN in networking?", answer: "SECURE COMMUNICATION OVER A NETWORK", difficulty: "DIFFICULT" },
+        { question: "What is the significance of the term 'Big-O' in algorithm analysis?", answer: "TIME AND SPACE COMPLEXITY", difficulty: "DIFFICULT" },
+        { question: "What is the difference between TCP and UDP in networking?", answer: "NETWORK TRANSMISSION PROTOCOLS", difficulty: "DIFFICULT" },
+        { question: "Explain the 'this' keyword in JavaScript.", answer: "REFERS TO THE OBJECT IT BELONGS TO", difficulty: "DIFFICULT" },
+        { question: "What is the role of a 'package manager' in software development?", answer: "MANAGE LIBRARY DEPENDENCIES", difficulty: "DIFFICULT" },
+        { question: "What is the purpose of the 'SQL' language?", answer: "MANAGE AND QUERY DATABASES", difficulty: "DIFFICULT" },
+        { question: "Describe the concept of 'dependency injection' in software design.", answer: "INVERSION OF CONTROL", difficulty: "DIFFICULT" },
+        { question: "What is a 'design pattern' in software development?", answer: "REUSABLE SOLUTION TO COMMON PROBLEMS", difficulty: "DIFFICULT" }
+    ];
+
+    let currentQuestionIndex = 0;
+    let totalPoints = 0;
+    let incorrectGuesses = 0;
+    let selectedWord;
+    let guessedWord;
+    let heartsLeft = 3;
+
+    function initializeGame(difficulty) {
+        currentQuestionIndex = 0;
+        totalPoints = 0;
+        incorrectGuesses = 0;
+        let questionsArray;
+        switch (difficulty) {
+            case 'EASY':
+                questionsArray = easyQuestions;
+                break;
+            case 'MODERATE':
+                questionsArray = moderateQuestions;
+                break;
+            case 'DIFFICULT':
+                questionsArray = hardQuestions;
+                break;
+            default:
+                throw new Error('Invalid difficulty level. Must be "EASY", "MODERATE", or "DIFFICULT".');
+        }
+        selectedWord = questionsArray[currentQuestionIndex].answer.toUpperCase();
+        guessedWord = Array(selectedWord.length).fill('_');
+        updateDisplay();
+        renderKeyboard();
+        renderAnswerDisplay();
+        document.getElementById('clue-button').style.display = 'block';
+        showDifficultyWarning();
+        updateScoreDisplay();
+        heartsLeft = 3;
+        updateHeartsDisplay();
+    }
+
+   function updateDisplay() {
+        const currentQuestion = questions[currentQuestionIndex].question;
+        document.getElementById('word-display').innerText = currentQuestion;
+    }
+
+    function renderAnswerDisplay() {
+        const answerDisplay = document.getElementById('answer-display');
+        answerDisplay.innerHTML = "";
+
+        for (let i = 0; i < selectedWord.length; i++) {
+            const letterSpan = document.createElement('span');
+            letterSpan.innerText = guessedWord[i] || '_';
+            answerDisplay.appendChild(letterSpan);
+            if (i < selectedWord.length - 1) {
+                const spaceSpan = document.createElement('span');
+                spaceSpan.innerText = ' ';
+                answerDisplay.appendChild(spaceSpan);
+            }
+        }
+    }
+
+    function renderKeyboard() {
+        const keyboardContainer = document.getElementById('keyboard');
+        keyboardContainer.innerHTML = "";
+
+        // Letter buttons (A-Z)
+        for (let i = 65; i <= 90; i++) {
+            const letter = String.fromCharCode(i);
+            const letterButton = createButton(letter);
+            letterButton.addEventListener('click', () => guessLetter(letter));
+            keyboardContainer.appendChild(letterButton);
+        }
+
+        // Number buttons (1-10)
+        for (let i = 0; i <= 9; i++) {
+            const numberButton = createButton(i.toString());
+            numberButton.addEventListener('click', () => guessNumber(i));
+            keyboardContainer.appendChild(numberButton);
+        }
+
+        // Space button
+        const spaceButton = createButton('SPACE');
+        spaceButton.id = 'space-button';
+        spaceButton.addEventListener('click', () => guessLetter(' '));
+        keyboardContainer.appendChild(spaceButton);
+    }
+
+    function createButton(label) {
+        const button = document.createElement('div');
+        button.classList.add('letter');
+        button.innerText = label;
+        return button;
+    }
+
+    function guessLetter(letter) {
+        handleGuess(letter);
+    }
+
+    function guessNumber(number) {
+        handleGuess(number.toString());
+    }
+    
+    function handleGuess(guess) {
+        const currentAnswer = selectedWord;
+        if (currentAnswer.includes(guess)) {
+            for (let i = 0; i < currentAnswer.length; i++) {
+                if (currentAnswer[i] === guess) {
+                    guessedWord[i] = guess;
+                }
+            }
+            // Check if the entire word has been guessed
+            if (guessedWord.join('') === currentAnswer) {
+                totalPoints += 10;
+                // Move to the next question or end the game if needed
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    selectedWord = questions[currentQuestionIndex].answer.toUpperCase();
+                    guessedWord = Array(selectedWord.length).fill('_');
+                    updateDisplay();
+                    renderAnswerDisplay();
+                    document.getElementById('clue-button').style.display = 'block';
+                    showDifficultyWarning();
+                    updateScoreDisplay();
+                } else {
+                    endGame();
+                }
+            } else {
+                renderAnswerDisplay();
+            }
+        } else {
+            incorrectGuesses++;
+            
+            heartsLeft--;
+            
+            if (heartsLeft <= 0) {
+                    // End the game if no hearts left
+                    endGame();
+                }
+                
+            updateHeartsDisplay();
+            }
+
+    // Move to the next question or end the game if needed
+    if (currentQuestionIndex >= questionsArray.length - 1) {
+        endGame();
+    } else {
+        currentQuestionIndex++;
+        selectedWord = questionsArray[currentQuestionIndex].answer.toUpperCase();
+        guessedWord = Array(selectedWord.length).fill('_');
+        updateDisplay();
+        renderAnswerDisplay();
+        document.getElementById('clue-button').style.display = 'block';
+        showDifficultyWarning();
+        updateScoreDisplay();
+    }
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangaroo Difficulty</title>
+    <style>
+        body {
+            background-color: #DD9A4B;
+        }
+        #difficulty-container {
+            font-family: Andale Mono, monospace;
+            color: #FFFFFF;
+            font-size: x-large;
+            margin-top: 10%;
+            font-weight: bold;
+            opacity: 80%;
+            cursor: pointer;
+            display: flex;
+            text-align: center;
+        }
+        .difficulty-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #FFFFFF;
+            color: #A17962;
+            font-size: large;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .difficulty-button:hover {
+            background-color: #A17962;
+            color: #FFFFFF;
+        }
+        .difficulty-container-inner {
+            display: flex;
+            justify-content: center;
+            width: 50%;
+        }
+    </style>
+</head>
+<body onclick="selectDifficulty()">
+
+<div id="difficulty-container">
+    <p>Click on a difficulty to start</p>
+    <div class="difficulty-container-inner">
+        <button id="easy-button" class="difficulty-button">Easy</button>
+        <button id="moderate-button" class="difficulty-button">Moderate</button>
+        <button id="hard-button" class="difficulty-button">Hard</button>
+    </div>
+</div>
+
+<script>
+    function selectDifficulty() {
+        const easyButton = document.getElementById('easy-button');
+        const moderateButton = document.getElementById('moderate-button');
+        const hardButton = document.getElementById('hard-button');
+
+        if (event.target === easyButton) {
+            sessionStorage.setItem('difficulty', 'EASY');
+            window.location.href = "game.html";
+        } else if (event.target === moderateButton) {
+            sessionStorage.setItem('difficulty', 'MODERATE');
+            window.location.href = "niggamoderate.html";
+        } else if (event.target === hardButton) {
+            sessionStorage.setItem('difficulty', 'HARD');
+            window.location.href = "niggahard.html";
+        }
+    }
+
+    // Initialize the game on page load
+    window.onload = () => {
+        if (sessionStorage.getItem('difficulty')) {
+            const difficulty = sessionStorage.getItem('difficulty');
+            if (difficulty === 'EASY') {
+                easyButton.click();
+            } else if (difficulty === 'MODERATE') {
+                moderateButton.click();
+                // window.location.href = "niggamoderate.html";
+            } else if (difficulty === 'HARD') {
+                hardButton.click();
+                // window.location.href = "niggahard.html";
+            }
+        }
+    };
+</script>
+
+</body>
+</html>
